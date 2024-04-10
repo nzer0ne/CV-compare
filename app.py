@@ -6,23 +6,23 @@ from sklearn.feature_extraction.text import CountVectorizer
 
 app = Flask(__name__)
 
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
-    print ("ggg")
     if request.method == 'POST':
         try:
 
             textjd = request.form['jdtxt']
             textcv = request.form['cvtxt']
-            #print (textjd)
-            #print (textcv)
+           # print (textjd)
+           # print (textcv)
             documents = [textjd, textcv]
-            count_vectorizer = CountVectorizer()
-            sparse_matrix = count_vectorizer.fit_transform(documents)
+            vectorizer = CountVectorizer()
+            sparse_matrix = vectorizer.fit_transform(documents)
             doc_term_matrix = sparse_matrix.todense()
             df = pd.DataFrame(doc_term_matrix, 
-                        columns=count_vectorizer.get_feature_names(), 
+                        columns=vectorizer.get_feature_names_out(), 
                         index=['textjd', 'textcv'])
             answer = cosine_similarity(df, df)
             answer = pd.DataFrame(answer)
@@ -32,9 +32,11 @@ def index():
         except:
             return render_template('index.html')
     else:
-            return render_template('index.html')
+        return render_template('index.html')
         
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port = 5000, debug=True)
+
+
